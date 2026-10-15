@@ -743,6 +743,10 @@ Same code, other `sp` offsets or frame size.
 
 ## Instruction order
 
+- Stores through a walking pointer written `*p-- = a; *p-- = b;` compile at the same size as `p[0] = a; p[-1] = b;
+  p -= 2;` but allocate and schedule differently: DWC's `EncodeWindows` (`crypt.c`) only gets the original's
+  registers (a hoisted constant in fp) and order in the post-decrement form. A chained `current = low = *next++;`
+  likewise puts the load ahead of the next comparison, where a separate `current = low;` later does not.
 - In `call() != x`, MWCC compares the call's result second (`cmp r1, r0`). The result first (`cmp r0, r1`) is the
   result assigned to a local as its own statement and then compared: `snd_arc.c`'s `SetupArc` matches with
   `readSize = romfs_fread(...); if (readSize != arc->header.infoSize)`, where every cast on either side kept the order.
