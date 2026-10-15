@@ -102,24 +102,30 @@ static void ghiFreePostItem(void *element) {
     }
 }
 
-GHIPost *ghiNewPost(void) {
-    GHIPost *post = func_ov011_0216dddc(sizeof(GHIPost));
+static inline void *ghiCalloc(u32 size) {
+    char *mem = func_ov011_0216dddc(size);
     char *p;
-    u32 size;
 
-    if (post == NULL) {
-        return NULL;
+    if (mem != NULL) {
+        p = mem;
+        while (size != 0) {
+            *p++ = 0;
+            size--;
+        }
     }
-    p = (char *)post;
-    size = sizeof(GHIPost);
-    while (size--) {
-        *p++ = 0;
-    }
-    post->autoFree = TRUE;
-    post->items = func_ov011_02171514(sizeof(GHIPostItem), 0, ghiFreePostItem);
-    if (post->items == NULL) {
-        func_ov011_0216ddfc(post);
-        return NULL;
+    return mem;
+}
+
+GHIPost *ghiNewPost(void) {
+    GHIPost *post = ghiCalloc(sizeof(GHIPost));
+
+    if (post != NULL) {
+        post->autoFree = TRUE;
+        post->items = func_ov011_02171514(sizeof(GHIPostItem), 0, ghiFreePostItem);
+        if (post->items == NULL) {
+            func_ov011_0216ddfc(post);
+            return NULL;
+        }
     }
     return post;
 }

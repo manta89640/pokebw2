@@ -1811,6 +1811,10 @@ Narrowing shifts, reloads, recomputed addresses and folded constants.
 
 ## Loops
 
+- A byte-clearing loop's count-down form shows its spelling: `subs r4, r4, #1; bne` is a `u32` count written
+  `while (size != 0) { *p++ = 0; size--; }`, `subs r0, r4, #1` then `bhs` is `while (size--)`, and `cmp; bgt` is an
+  `int` count. GameSpy's `ghiNewPost` (`ghttpPost.c`) came 6 bytes closer with the first form. Such a loop shares its
+  zero register with the zeros after it only when it dominates them; under `if (mem != NULL)` they get their own `movs`.
 - MWCC doesn't turn an indexed loop into stepped pointers. When the original steps pointers through arrays, the source
   stepped them: multiboot's `MBFile_InitSegments` (`mb_segment.c`) comes 8 bytes short as an index loop and only reaches
   the original's size as `for (kind = ..., segment = ..., i = 0; ...; i++, segment++, kind++)`.
