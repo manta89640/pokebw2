@@ -379,6 +379,10 @@ Same instructions, registers swapped.
 - A constant assigned once and passed to a call is propagated as an immediate; assigned in both arms of an `if`,
   next to the values that do differ, it stays in a saved register. The Pokéstar counter's `PkwdCount_StartFade` sets
   `delay = 4;` beside `start` and `end` in each arm (`r6`, 0x5c); with one assignment it was 0x58.
+- A value that a branch condition fixes (`if (length == 4)`) isn't propagated into the calls inside the branch: passing
+  the variable reuses its register and passing the literal adds a `movs`. The extra instruction can shift every
+  register after it, so a register-only diff near such a call is worth this check first. DWC's `OnHttpEvent` (`nd.c`)
+  matched with `Base64Decode(code, body + start, valueLength)` where it had `4`.
 - A sign extension split between the prologue and a later compare is a narrow local declared first and assigned late
   from an `int` parameter: the film choice screen's `BChoiceMain_SetChoicePalette` takes `int palette` and has
   `s16 pal;` declared before its other locals and assigned after their initializers (4 bytes short before). In the

@@ -907,7 +907,7 @@ static int OnHttpEvent(int request, int event, void *arg) {
                         pos++;
                         if (isCode) {
                             if (valueLength == 4) {
-                                int size = Base64Decode(code, body + start, 4);
+                                int size = Base64Decode(code, body + start, valueLength);
 
                                 code[size] = '\0';
                                 serverError = ParseInt(code, size);
